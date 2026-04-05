@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="180" fill="#1a1a2e"/>
+
+  <!-- Stars -->
+  <circle cx="160" cy="180" r="12" fill="white" opacity="0.6"/>
+  <circle cx="860" cy="220" r="8"  fill="white" opacity="0.5"/>
+  <circle cx="780" cy="820" r="10" fill="white" opacity="0.5"/>
+  <circle cx="200" cy="800" r="9"  fill="white" opacity="0.6"/>
+  <circle cx="500" cy="120" r="7"  fill="white" opacity="0.4"/>
+
+  <!-- Bubble glow -->
+  <circle cx="512" cy="540" r="340" fill="#4d96ff" opacity="0.15"/>
+
+  <!-- Main bubble -->
+  <circle cx="512" cy="540" r="300" fill="url(#bubbleGrad)"/>
+
+  <!-- Bubble highlight (top-left shine) -->
+  <ellipse cx="400" cy="420" rx="90" ry="60" fill="white" opacity="0.25" transform="rotate(-30 400 420)"/>
+
+  <!-- Small shine dot -->
+  <circle cx="360" cy="390" r="30" fill="white" opacity="0.3"/>
+
+  <!-- Star inside bubble -->
+  <text x="512" y="620" font-size="280" text-anchor="middle" font-family="Arial, sans-serif">⭐</text>
+
+  <!-- Small decorative bubbles -->
+  <circle cx="220" cy="400" r="55" fill="url(#grad2)" opacity="0.9"/>
+  <circle cx="820" cy="380" r="45" fill="url(#grad3)" opacity="0.9"/>
+  <circle cx="300" cy="720" r="40" fill="url(#grad4)" opacity="0.9"/>
+  <circle cx="750" cy="700" r="50" fill="url(#grad5)" opacity="0.9"/>
+
+  <defs>
+    <radialGradient id="bubbleGrad" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#74aeff"/>
+      <stop offset="100%" stop-color="#0a3d8f"/>
+    </radialGradient>
+    <radialGradient id="grad2" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#ff8e8e"/>
+      <stop offset="100%" stop-color="#cc2222"/>
+    </radialGradient>
+    <radialGradient id="grad3" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#cc8800"/>
+    </radialGradient>
+    <radialGradient id="grad4" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#8ee89b"/>
+      <stop offset="100%" stop-color="#228822"/>
+    </radialGradient>
+    <radialGradient id="grad5" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#e07af5"/>
+      <stop offset="100%" stop-color="#7a22cc"/>
+    </radialGradient>
+  </defs>
+</svg>

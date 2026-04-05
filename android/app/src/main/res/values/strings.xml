@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pop the Bubbles</string>
+    <string name="title_activity_main">Pop the Bubbles</string>
+    <string name="package_name">com.ganeshbalan86.babybubble</string>
+    <string name="custom_url_scheme">com.ganeshbalan86.babybubble</string>
+</resources>

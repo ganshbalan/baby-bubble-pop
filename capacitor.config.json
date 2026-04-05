@@ -1,0 +1,8 @@
+{
+  "appId": "com.ganeshbalan86.babybubble",
+  "appName": "Pop the Bubbles",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
