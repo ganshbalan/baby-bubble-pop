@@ -1,4 +1,4 @@
-const CACHE = 'bubble-v1';
+const CACHE = 'bubble-v2';
 const ASSETS = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
