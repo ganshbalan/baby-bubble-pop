@@ -359,6 +359,118 @@
 </div>
 
 <script>
+// ── Audio ──────────────────────────────────────────────────────────────
+let audioCtx = null;
+let musicPlaying = false;
+let musicNodes = [];
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playPop() {
+  const ctx = getCtx();
+  const t = ctx.currentTime;
+
+  // Noise burst (bubble body)
+  const bufLen = Math.floor(ctx.sampleRate * 0.12);
+  const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 2);
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(1200, t);
+  filter.frequency.exponentialRampToValueAtTime(300, t + 0.1);
+  filter.Q.value = 0.8;
+
+  const gainN = ctx.createGain();
+  gainN.gain.setValueAtTime(1, t);
+  gainN.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+  noise.connect(filter); filter.connect(gainN); gainN.connect(ctx.destination);
+  noise.start(t); noise.stop(t + 0.13);
+
+  // Soft "plop" tone
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(520, t);
+  osc.frequency.exponentialRampToValueAtTime(180, t + 0.1);
+
+  const gainO = ctx.createGain();
+  gainO.gain.setValueAtTime(0.4, t);
+  gainO.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
+  osc.connect(gainO); gainO.connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.1);
+}
+
+function playCelebration() {
+  const ctx = getCtx();
+  const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+  notes.forEach((freq, i) => {
+    const t = ctx.currentTime + i * 0.13;
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, t);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.4, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.35);
+  });
+}
+
+// Background melody — Twinkle Twinkle in C major
+const MELODY = [
+  [261,0.4],[261,0.4],[392,0.4],[392,0.4],[440,0.4],[440,0.4],[392,0.8],
+  [349,0.4],[349,0.4],[330,0.4],[330,0.4],[294,0.4],[294,0.4],[261,0.8],
+  [392,0.4],[392,0.4],[349,0.4],[349,0.4],[330,0.4],[330,0.4],[294,0.8],
+  [392,0.4],[392,0.4],[349,0.4],[349,0.4],[330,0.4],[330,0.4],[294,0.8],
+  [261,0.4],[261,0.4],[392,0.4],[392,0.4],[440,0.4],[440,0.4],[392,0.8],
+  [349,0.4],[349,0.4],[330,0.4],[330,0.4],[294,0.4],[294,0.4],[261,0.8],
+];
+
+let melodyTimeout;
+
+function startMusic() {
+  if (musicPlaying) return;
+  musicPlaying = true;
+  scheduleMelody(0);
+}
+
+function scheduleMelody(noteIndex) {
+  if (!musicPlaying) return;
+  const ctx = getCtx();
+  const [freq, dur] = MELODY[noteIndex % MELODY.length];
+  const t = ctx.currentTime;
+
+  if (freq > 0) {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.12, t + 0.02);
+    g.gain.setValueAtTime(0.12, t + dur * 0.7);
+    g.gain.linearRampToValueAtTime(0, t + dur);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + dur);
+  }
+
+  melodyTimeout = setTimeout(() => scheduleMelody(noteIndex + 1), dur * 1000);
+}
+
+function stopMusic() {
+  musicPlaying = false;
+  clearTimeout(melodyTimeout);
+}
+
 // ── State ──────────────────────────────────────────────────────────────
 let score = 0;
 let level = 1;
@@ -489,6 +601,7 @@ function popBubble(bubble, cx, cy, c1, c2) {
   sp.addEventListener('animationend', () => sp.remove());
 
   // Level complete?
+  playPop();
   if (score >= goal && !celebrating) celebrate();
 }
 
@@ -503,6 +616,8 @@ function startSpawning() {
 function celebrate() {
   celebrating = true;
   clearTimeout(spawnTimer);
+  stopMusic();
+  playCelebration();
   document.getElementById('celebration').classList.add('show');
   launchConfetti();
 }
@@ -537,6 +652,7 @@ function nextLevel() {
   document.getElementById('score').textContent = '0';
   document.getElementById('goal').textContent  = goal;
   document.getElementById('celebration').classList.remove('show');
+  startMusic();
   startSpawning();
 }
 
@@ -551,19 +667,19 @@ function togglePause() {
 
   if (paused) {
     clearTimeout(spawnTimer);
+    stopMusic();
     pauseScreen.classList.add('show');
     pauseBtn.textContent = '▶';
-    // Pause all bubble animations
     document.querySelectorAll('.bubble').forEach(b => {
       b.style.animationPlayState = 'paused';
     });
   } else {
     pauseScreen.classList.remove('show');
     pauseBtn.textContent = '⏸';
-    // Resume all bubble animations
     document.querySelectorAll('.bubble').forEach(b => {
       b.style.animationPlayState = 'running';
     });
+    startMusic();
     startSpawning();
   }
 }
@@ -573,6 +689,7 @@ function startGame() {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('pause-btn').classList.add('visible');
   document.getElementById('goal').textContent = goal;
+  startMusic();
   startSpawning();
 }
 
