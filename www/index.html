@@ -526,7 +526,7 @@ function spawnBubble(midScreen = false) {
   const area    = document.getElementById('game-area');
   const [c1,c2] = COLORS[Math.floor(Math.random() * COLORS.length)];
   const emoji   = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-  const size    = Math.random() * 70 + 80;          // 80–150 px
+  const size    = Math.random() * 40 + 50;          // 50–90 px
   const speed   = Math.random() * 8 + 7;            // 7–15 s
   const left    = Math.random() * (window.innerWidth - size);
 
