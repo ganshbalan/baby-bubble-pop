@@ -514,7 +514,7 @@ document.addEventListener('mousedown', () => { cursorEl.style.transform = 'trans
 document.addEventListener('mouseup',   () => { cursorEl.style.transform = 'translate(-50%,-50%) scale(1)';   });
 
 // ── Bubble creation ────────────────────────────────────────────────────
-function spawnBubble() {
+function spawnBubble(midScreen = false) {
   if (celebrating) return;
 
   const area    = document.getElementById('game-area');
@@ -524,11 +524,16 @@ function spawnBubble() {
   const speed   = Math.random() * 8 + 7;            // 7–15 s
   const left    = Math.random() * (window.innerWidth - size);
 
+  // For initial burst, place bubbles at random heights already on screen
+  const bottomPos = midScreen
+    ? -(size + Math.random() * window.innerHeight * 0.8)
+    : -size;
+
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.style.cssText = `
     width:${size}px; height:${size}px;
-    left:${left}px; bottom:-${size}px;
+    left:${left}px; bottom:${bottomPos}px;
     background: radial-gradient(circle at 35% 35%, ${c2}, ${c1});
     animation-duration:${speed}s;
     font-size:${size * 0.42}px;
@@ -606,10 +611,14 @@ function popBubble(bubble, cx, cy, c1, c2) {
 }
 
 // ── Spawner ────────────────────────────────────────────────────────────
-function startSpawning() {
+function startSpawning(initial = false) {
+  if (initial) {
+    // Spawn 6 bubbles immediately at random heights so screen fills instantly
+    for (let i = 0; i < 6; i++) spawnBubble(true);
+  }
   const interval = Math.max(600, 1200 - level * 80);
   spawnBubble();
-  spawnTimer = setTimeout(startSpawning, interval);
+  spawnTimer = setTimeout(() => startSpawning(), interval);
 }
 
 // ── Celebration ────────────────────────────────────────────────────────
@@ -690,7 +699,7 @@ function startGame() {
   document.getElementById('pause-btn').classList.add('visible');
   document.getElementById('goal').textContent = goal;
   startMusic();
-  startSpawning();
+  startSpawning(true);
 }
 
 // ── Touch feedback ─────────────────────────────────────────────────────
